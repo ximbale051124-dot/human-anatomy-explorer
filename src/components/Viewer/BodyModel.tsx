@@ -133,6 +133,11 @@ function ZAnatomyAssetModel({
       const isSelected = structureId !== null && structureId === selectedStructureId;
       const isHovered = hoveredMeshKey === meshKey(asset, object.name);
       object.userData.structureId = structureId;
+      // The full-body Myology supplement fills the spaces that the original
+      // detailed layer does not cover. It must remain visually present without
+      // becoming an invisible click shield over the established bone and organ
+      // meshes, whose information panels are still the interaction source.
+      object.raycast = asset.id === 'muscular-body' ? () => undefined : THREE.Mesh.prototype.raycast;
       object.visible = !isMuscleCoveringLayer(asset, object.name) && layerVisibility[asset.layer] &&
         (system === 'integumentary' || systemVisibility[system]);
       object.castShadow = false;

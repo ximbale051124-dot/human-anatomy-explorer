@@ -14,9 +14,13 @@ export const Z_ANATOMY_ASSETS: ZAnatomyAsset[] = [
   { id: 'skin', url: '/models/z-anatomy-clean/skin.glb?v=isolated-20260922', layer: 'skin', system: 'integumentary' },
   { id: 'skeletal', url: '/models/z-anatomy-clean/skeletal.glb?v=isolated-20260922', layer: 'bones', system: 'skeletal' },
   { id: 'joints', url: '/models/z-anatomy-clean/joints.glb?v=isolated-20260922', layer: 'bones', system: 'joints' },
-  // Z-Anatomy's complete Myology atlas: independently named muscles across
-  // the head, trunk, and limbs, including the associated tendons and cartilage.
-  { id: 'muscular', url: '/models/z-anatomy-clean/muscular.glb?v=myology-20260922', layer: 'muscles', system: 'muscular' },
+  // Keep the previous vertex-colour layer unchanged for the detailed facial
+  // muscle rendering and its existing selection feedback.
+  { id: 'muscular', url: '/models/z-anatomy-clean/muscular-vertex.glb?v=tissue-vertex-20260922', layer: 'muscles', system: 'muscular' },
+  // Add the complete Z-Anatomy Myology mesh for the trunk and limbs. It is a
+  // visual supplement only, so it cannot block selection of the prior atlas
+  // structures beneath it.
+  { id: 'muscular-body', url: '/models/z-anatomy-clean/muscular.glb?v=body-muscles-20260922', layer: 'muscles', system: 'muscular' },
   { id: 'cardiovascular', url: '/models/z-anatomy-clean/cardiovascular.glb?v=isolated-20260922', layer: 'organs', system: 'cardiovascular' },
   { id: 'lymphatic', url: '/models/z-anatomy-clean/lymphatic.glb?v=isolated-20260922', layer: 'organs', system: 'lymphatic' },
   { id: 'visceral', url: '/models/z-anatomy-clean/visceral.glb?v=isolated-20260922', layer: 'organs', system: 'digestive' },
