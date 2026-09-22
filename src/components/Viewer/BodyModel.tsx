@@ -1,115 +1,67 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { MESH_CONFIGS } from '../../data/meshConfigs';
+import { useLoader, type ThreeEvent } from '@react-three/fiber';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import { Z_ANATOMY_ASSETS, structureIdForMesh, systemForMesh, type ZAnatomyAsset } from '../../data/zAnatomyModel';
 import { useAnatomy } from '../../context/AnatomyContext';
-import type { MeshConfig } from '../../types/anatomy';
-
-// -----------------------------------------------------------------------
-// PLACEHOLDER 3D MODEL
-// -----------------------------------------------------------------------
-// This component renders a simple humanoid figure built from primitive
-// Three.js geometries (see src/data/meshConfigs.ts for placement). It is a
-// stand-in until a real anatomical GLB/GLTF model is available.
-//
-// >>> HOW TO REPLACE WITH A REAL GLB/GLTF MODEL <<<
-// 1. Place your .glb/.gltf file in `public/models/` (create the folder),
-//    e.g. `public/models/human-body.glb`.
-// 2. In this file, replace the primitive rendering below with something like:
-//
-//      import { useGLTF } from '@react-three/drei';
-//
-//      export function BodyModel() {
-//        const { scene } = useGLTF('/models/human-body.glb');
-//        const { selectedStructureId, selectStructure, systemVisibility, layerVisibility } = useAnatomy();
-//
-//        useEffect(() => {
-//          scene.traverse((obj) => {
-//            if (!(obj instanceof THREE.Mesh)) return;
-//            // Map each mesh name in the GLB to a structure id from
-//            // src/data/structures.ts. Keep a lookup table (meshName -> { structureId, system, layer })
-//            // similar to MESH_CONFIGS, then set obj.visible and obj.material
-//            // color/emissive based on the current context state, the same
-//            // way computeVisible()/computeColor() do below.
-//          });
-//        }, [scene, systemVisibility, layerVisibility, selectedStructureId]);
-//
-//        return <primitive object={scene} />;
-//      }
-//
-// 3. Delete src/data/meshConfigs.ts once every mesh in the GLB is mapped.
-// -----------------------------------------------------------------------
-
 const HIGHLIGHT_COLOR = new THREE.Color('#FFD23F');
 
-function Primitive({ config }: { config: MeshConfig }) {
+function materials(mesh: THREE.Mesh): THREE.Material[] {
+  return Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+}
+
+function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
+  const source = useLoader(FBXLoader, asset.url);
+  const model = useMemo(() => source.clone(true), [source]);
   const { selectedStructureId, selectStructure, systemVisibility, layerVisibility } = useAnatomy();
 
-  const visible =
-    layerVisibility[config.layer] &&
-    (config.system === 'integumentary' ? true : systemVisibility[config.system]);
+  useEffect(() => {
+    model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const system = systemForMesh(asset, object.name);
+      const structureId = structureIdForMesh(object.name);
+      object.userData.structureId = structureId;
+      object.visible = layerVisibility[asset.layer] &&
+        (system === 'integumentary' || systemVisibility[system]);
+      object.castShadow = false;
+      object.receiveShadow = false;
 
-  const isSelected = selectedStructureId === config.structureId;
-
-  const geometryArgs = config.args as [number, number, number, number];
-
-  const geometry = useMemo(() => {
-    switch (config.geometry) {
-      case 'box':
-        return <boxGeometry args={config.args as [number, number, number]} />;
-      case 'sphere':
-        return <sphereGeometry args={[config.args[0], 24, 16]} />;
-      case 'cylinder':
-        return <cylinderGeometry args={[config.args[0], config.args[1], config.args[2], config.args[3] ?? 12]} />;
-      case 'capsule':
-        return <capsuleGeometry args={[config.args[0], config.args[1], config.args[2] ?? 4, config.args[3] ?? 8]} />;
-      case 'torus':
-        return <torusGeometry args={[config.args[0], config.args[1], config.args[2] ?? 8, config.args[3] ?? 16]} />;
-      case 'cone':
-        return <coneGeometry args={[config.args[0], config.args[1], config.args[2] ?? 12]} />;
-      default:
-        return <boxGeometry args={geometryArgs} />;
-    }
-  }, [config.geometry, config.args, geometryArgs]);
-
-  if (!visible) return null;
+      materials(object).forEach((material) => {
+        const standard = material as THREE.MeshStandardMaterial;
+        if ('emissive' in standard) {
+          standard.emissive.set(structureId === selectedStructureId ? HIGHLIGHT_COLOR : '#000000');
+          standard.emissiveIntensity = structureId === selectedStructureId ? 0.8 : 0;
+        }
+        if (asset.layer === 'skin') {
+          material.transparent = true;
+          material.opacity = 0.22;
+          material.depthWrite = false;
+        }
+        material.needsUpdate = true;
+      });
+    });
+  }, [asset, layerVisibility, model, selectedStructureId, systemVisibility]);
 
   return (
-    <mesh
-      position={config.position}
-      rotation={config.rotation ?? [0, 0, 0]}
-      castShadow
-      receiveShadow
-      onClick={(e) => {
-        e.stopPropagation();
-        selectStructure(config.structureId);
+    <primitive
+      object={model}
+      scale={0.01}
+      onClick={(event: ThreeEvent<MouseEvent>) => {
+        event.stopPropagation();
+        const mesh = event.object as THREE.Mesh;
+        const structureId = mesh.userData.structureId as string | null | undefined;
+        if (structureId) selectStructure(structureId);
       }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = 'auto';
-      }}
-      userData={{ structureId: config.structureId }}
-    >
-      {geometry}
-      <meshStandardMaterial
-        color={isSelected ? HIGHLIGHT_COLOR : config.color}
-        emissive={isSelected ? HIGHLIGHT_COLOR : new THREE.Color('#000000')}
-        emissiveIntensity={isSelected ? 0.5 : 0}
-        roughness={0.55}
-        metalness={0.05}
-      />
-    </mesh>
+      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+      onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+    />
   );
 }
 
 export function BodyModel() {
   return (
     <group>
-      {MESH_CONFIGS.map((config) => (
-        <Primitive key={config.meshId} config={config} />
-      ))}
+      {Z_ANATOMY_ASSETS.map((asset) => <ZAnatomyAssetModel key={asset.id} asset={asset} />)}
     </group>
   );
 }

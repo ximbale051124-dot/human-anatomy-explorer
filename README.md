@@ -40,11 +40,7 @@ npm run build
 npm run preview
 ```
 
-> Note: this project was written and reviewed carefully, but it has **not**
-> been run through `npm install` / `npm run build` in the environment that
-> generated it, since that environment has no network access to the npm
-> registry. Please run `npm install && npm run dev` yourself as the first
-> step, and let me know if you hit any errors — I'll fix them immediately.
+The production build has been verified after the Z-Anatomy integration.
 
 ## Project structure
 
@@ -54,14 +50,14 @@ src/
   data/
     systems.ts               The 9 body systems (id, label, color, description)
     structures.ts             Anatomical structure info (name, location, function, etc.)
-    meshConfigs.ts             Placement of placeholder 3D primitives — SEE BELOW
+    zAnatomyModel.ts           Z-Anatomy asset catalogue and mesh-to-structure mapping
   context/AnatomyContext.tsx   App-wide state: selection, system/layer visibility, search, camera commands
   components/
     Header/SearchBar.tsx
     Sidebar/SystemsPanel.tsx
     Sidebar/LayerControls.tsx
     Viewer/Scene3D.tsx         <Canvas> setup, lights, environment
-    Viewer/BodyModel.tsx       Renders the 3D body — see below for GLB instructions
+    Viewer/BodyModel.tsx       Loads and renders the Z-Anatomy system meshes
     Viewer/CameraRig.tsx       OrbitControls + Front/Back/Left/Right/Reset/Focus logic
     Viewer/ViewControls.tsx    The view preset buttons
     InfoPanel/InfoPanel.tsx    Structure detail panel
@@ -74,41 +70,35 @@ Anatomy **data** (`src/data/`) is completely separate from the **UI
 components** (`src/components/`), so you can edit or expand the anatomy
 content without touching any rendering code, and vice versa.
 
-## Where to add a real GLB/GLTF anatomical model
+## Included real anatomy model
 
-Right now the 3D body is a placeholder made of simple primitive shapes
-(spheres, boxes, cylinders), positioned and colored to roughly resemble a
-human figure with skin, bones, muscles, and organs. This keeps the whole
-interaction model (selection, systems, layers, search, camera) fully working
-without needing a licensed anatomy asset.
+The viewer now loads the real Z-Anatomy atlas as separate system-level FBX
+assets from `public/models/z-anatomy/`. This keeps the anatomy layers and
+systems independently visible while avoiding a proprietary model or backend.
+The integration deliberately excludes Z-Anatomy's nervous-system file.
 
-To use a real model:
+`src/data/zAnatomyModel.ts` is the single integration point. It declares the
+asset files, classifies the combined visceral model into the digestive,
+urinary, reproductive, endocrine, and respiratory systems, and maps source
+mesh names to the structures in `structures.ts` for search, selection, and
+highlighting.
 
-1. Put your `.glb` or `.gltf` file in **`public/models/`**, e.g.
-   `public/models/human-body.glb`.
-2. Open **`src/components/Viewer/BodyModel.tsx`** — there is a detailed
-   comment at the top of that file with a code example. In short: load the
-   model with `useGLTF('/models/human-body.glb')` from `@react-three/drei`,
-   then walk the loaded scene's meshes and map each mesh name to a
-   `structureId` from `src/data/structures.ts` (the same way
-   `src/data/meshConfigs.ts` currently maps placeholder shapes to structure
-   ids). Use that mapping to drive visibility (systems/layers) and the
-   selection highlight, exactly like the placeholder does.
-3. Once every relevant mesh in your GLB is mapped, you can delete
-   `src/data/meshConfigs.ts` — it's only used by the placeholder.
+### Attribution and license
 
-If your model separates meshes by system/layer already (e.g. a mesh named
-`heart`, another named `femur_L`), this mapping step is usually just a
-lookup table with a dozen or so entries per system.
+The included assets are from **Z-Anatomy — the libre 3D atlas of anatomy** by
+Gauthier Kervyn, Marcin Zielinski, and Lluís Vinent Juanico, with a model
+lineage from **BodyParts3D — The Database Center for Life Science**. They are
+provided under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+Keep the attribution in `public/models/z-anatomy/ATTRIBUTION.md` and release
+any redistributed model derivatives under the same license.
 
 ## Adding more anatomy content
 
 To add a new structure:
 
 1. Add an entry to `STRUCTURES` in `src/data/structures.ts`.
-2. If you're still using the placeholder body, add a matching primitive to
-   `MESH_CONFIGS` in `src/data/meshConfigs.ts`. If you're using a real GLB,
-   add the mesh-name mapping described above instead.
+2. Add a matching source-mesh pattern to `structureMatchers` in
+   `src/data/zAnatomyModel.ts`.
 
 No other files need to change — the sidebar, search, and info panel all read
 from this shared data automatically.

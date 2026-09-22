@@ -31,7 +31,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'vertebral-column',
-    anatomicalName: 'Columna Vertebralis',
+    anatomicalName: 'Vertebral Column',
     commonName: 'Spine',
     system: 'skeletal',
     layer: 'bones',
@@ -53,7 +53,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'pelvis',
-    anatomicalName: 'Os Coxae',
+    anatomicalName: 'Hip Bone',
     commonName: 'Pelvis',
     system: 'skeletal',
     layer: 'bones',
@@ -132,7 +132,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'deltoid',
-    anatomicalName: 'Deltoideus',
+    anatomicalName: 'Deltoid Muscle',
     commonName: 'Shoulder muscle',
     system: 'muscular',
     layer: 'muscles',
@@ -211,7 +211,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   // ------------------------------------------------------- CARDIOVASCULAR
   {
     id: 'heart',
-    anatomicalName: 'Cor',
+    anatomicalName: 'Heart',
     commonName: 'Heart',
     system: 'cardiovascular',
     layer: 'organs',
@@ -254,7 +254,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'lung-left',
-    anatomicalName: 'Pulmo Sinister',
+    anatomicalName: 'Left Lung',
     commonName: 'Left lung',
     system: 'respiratory',
     layer: 'organs',
@@ -265,7 +265,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'lung-right',
-    anatomicalName: 'Pulmo Dexter',
+    anatomicalName: 'Right Lung',
     commonName: 'Right lung',
     system: 'respiratory',
     layer: 'organs',
@@ -278,7 +278,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   // ----------------------------------------------------------- DIGESTIVE
   {
     id: 'liver',
-    anatomicalName: 'Hepar',
+    anatomicalName: 'Liver',
     commonName: 'Liver',
     system: 'digestive',
     layer: 'organs',
@@ -289,7 +289,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'stomach',
-    anatomicalName: 'Gaster',
+    anatomicalName: 'Stomach',
     commonName: 'Stomach',
     system: 'digestive',
     layer: 'organs',
@@ -300,7 +300,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'intestines',
-    anatomicalName: 'Intestinum Tenue et Crassum',
+    anatomicalName: 'Small and Large Intestines',
     commonName: 'Intestines',
     system: 'digestive',
     layer: 'organs',
@@ -313,7 +313,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   // ------------------------------------------------------------- URINARY
   {
     id: 'kidney-left',
-    anatomicalName: 'Ren Sinister',
+    anatomicalName: 'Left Kidney',
     commonName: 'Left kidney',
     system: 'urinary',
     layer: 'organs',
@@ -324,7 +324,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'kidney-right',
-    anatomicalName: 'Ren Dexter',
+    anatomicalName: 'Right Kidney',
     commonName: 'Right kidney',
     system: 'urinary',
     layer: 'organs',
@@ -335,7 +335,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'bladder',
-    anatomicalName: 'Vesica Urinaria',
+    anatomicalName: 'Urinary Bladder',
     commonName: 'Bladder',
     system: 'urinary',
     layer: 'organs',
@@ -348,7 +348,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   // -------------------------------------------------------- REPRODUCTIVE
   {
     id: 'reproductive-organs',
-    anatomicalName: 'Organa Genitalia Interna',
+    anatomicalName: 'Internal Reproductive Organs',
     commonName: 'Internal reproductive organs',
     system: 'reproductive',
     layer: 'organs',
@@ -361,7 +361,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   // --------------------------------------------------------- ENDOCRINE
   {
     id: 'thyroid',
-    anatomicalName: 'Glandula Thyroidea',
+    anatomicalName: 'Thyroid Gland',
     commonName: 'Thyroid gland',
     system: 'endocrine',
     layer: 'organs',
@@ -383,7 +383,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'adrenal-glands',
-    anatomicalName: 'Glandulae Suprarenales',
+    anatomicalName: 'Adrenal Glands',
     commonName: 'Adrenal glands',
     system: 'endocrine',
     layer: 'organs',
@@ -396,7 +396,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   // --------------------------------------------------------- LYMPHATIC
   {
     id: 'spleen',
-    anatomicalName: 'Splen',
+    anatomicalName: 'Spleen',
     commonName: 'Spleen',
     system: 'lymphatic',
     layer: 'organs',
@@ -418,7 +418,7 @@ export const STRUCTURES: AnatomicalStructure[] = [
   },
   {
     id: 'lymph-nodes',
-    anatomicalName: 'Nodi Lymphoidei',
+    anatomicalName: 'Lymph Nodes',
     commonName: 'Lymph nodes',
     system: 'lymphatic',
     layer: 'organs',
