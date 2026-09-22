@@ -72,3 +72,23 @@ export function systemForMesh(asset: ZAnatomyAsset, meshName: string): SystemId 
   if (/lung|bronch|trachea|larynx|pleura/i.test(meshName)) return 'respiratory';
   return 'digestive';
 }
+
+// Z-Anatomy has thousands of fine-grained meshes, while the MVP information
+// catalogue currently describes major teaching structures. A click on an
+// unmapped fine detail therefore opens a useful system representative instead
+// of leaving the details panel empty.
+export function fallbackStructureForSystem(system: SystemId | 'integumentary'): string {
+  const fallback: Record<SystemId | 'integumentary', string> = {
+    integumentary: 'skin',
+    skeletal: 'skull',
+    muscular: 'pectoralis-major',
+    cardiovascular: 'heart',
+    respiratory: 'lung-right',
+    digestive: 'liver',
+    urinary: 'kidney-right',
+    reproductive: 'reproductive-organs',
+    endocrine: 'thyroid',
+    lymphatic: 'spleen',
+  };
+  return fallback[system];
+}

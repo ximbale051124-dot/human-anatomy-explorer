@@ -45,7 +45,9 @@ export function AnatomyProvider({ children }: { children: React.ReactNode }) {
     ALL_SYSTEMS_TRUE
   );
   const [layerVisibility, setLayerVisibility] = useState<Record<LayerId, boolean>>({
-    skin: true,
+    // Start beneath the translucent surface so the contrasting system colours
+    // are immediately useful; learners can enable Skin when they need it.
+    skin: false,
     muscles: true,
     bones: true,
     organs: true,
