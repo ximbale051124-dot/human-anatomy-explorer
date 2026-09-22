@@ -13,6 +13,7 @@ USE_DRACO = True
 
 SYSTEMS = {
     "skeletal": "1: Skeletal system",
+    "joints": "3: Joints",
     "muscular": "4: Muscular system",
     "cardiovascular": "5: Cardiovascular system",
     "lymphatic": "6: Lymphoid organs",

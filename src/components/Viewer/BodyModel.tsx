@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import { type ThreeEvent } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
@@ -11,10 +11,12 @@ import {
 } from '../../data/zAnatomyModel';
 import { useAnatomy } from '../../context/AnatomyContext';
 const HIGHLIGHT_COLOR = new THREE.Color('#FFD23F');
+const HOVER_COLOR = new THREE.Color('#F4D35E');
 useGLTF.setDecoderPath('/draco/');
 const INTEGUMENTARY_COLOR = new THREE.Color('#E9B28C');
 const SYSTEM_COLORS: Record<string, THREE.Color> = {
   skeletal: new THREE.Color('#B8C7D9'),
+  joints: new THREE.Color('#63A89A'),
   muscular: new THREE.Color('#BF3E4A'),
   cardiovascular: new THREE.Color('#C92C36'),
   respiratory: new THREE.Color('#4D9DE0'),
@@ -39,7 +41,30 @@ function materials(object: RenderableAnatomyObject): THREE.Material[] {
   return Array.isArray(object.material) ? object.material : [object.material];
 }
 
-function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
+function meshKey(asset: ZAnatomyAsset, meshName: string) {
+  return `${asset.id}:${meshName}`;
+}
+
+function variedSystemColor(base: THREE.Color, meshName: string): THREE.Color {
+  // Preserve the model's anatomical segmentation even when a system has one
+  // teaching colour: a deterministic small lightness variation separates
+  // neighbouring muscles, bones, and organs without changing system identity.
+  let hash = 0;
+  for (let index = 0; index < meshName.length; index += 1) hash = (hash * 31 + meshName.charCodeAt(index)) | 0;
+  const color = base.clone();
+  color.offsetHSL(0, 0, ((hash % 9) - 4) * 0.018);
+  return color;
+}
+
+function ZAnatomyAssetModel({
+  asset,
+  hoveredMeshKey,
+  setHoveredMeshKey,
+}: {
+  asset: ZAnatomyAsset;
+  hoveredMeshKey: string | null;
+  setHoveredMeshKey: (key: string | null) => void;
+}) {
   const source = useGLTF(asset.url, true);
   const model = useMemo(() => {
     const clone = source.scene.clone(true);
@@ -75,6 +100,7 @@ function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
       const system = systemForMesh(asset, object.name);
       const structureId = structureIdForMesh(object.name);
       const isSelected = structureId !== null && structureId === selectedStructureId;
+      const isHovered = hoveredMeshKey === meshKey(asset, object.name);
       object.userData.structureId = structureId;
       object.visible = layerVisibility[asset.layer] &&
         (system === 'integumentary' || systemVisibility[system]);
@@ -83,13 +109,14 @@ function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
 
       materials(object).forEach((material) => {
         const standard = material as THREE.MeshStandardMaterial;
-        const baseColor = system === 'integumentary'
+        const systemColor = system === 'integumentary'
           ? INTEGUMENTARY_COLOR
           : SYSTEM_COLORS[system];
+        const baseColor = variedSystemColor(systemColor, object.name);
         standard.vertexColors = false;
-        standard.color.copy(isSelected ? HIGHLIGHT_COLOR : baseColor);
-        standard.emissive.set(isSelected ? HIGHLIGHT_COLOR : '#000000');
-        standard.emissiveIntensity = isSelected ? 0.65 : 0;
+        standard.color.copy(isSelected ? HIGHLIGHT_COLOR : isHovered ? HOVER_COLOR : baseColor);
+        standard.emissive.set(isSelected ? HIGHLIGHT_COLOR : isHovered ? HOVER_COLOR : '#000000');
+        standard.emissiveIntensity = isSelected ? 0.65 : isHovered ? 0.28 : 0;
         standard.transparent = false;
         standard.opacity = 1;
         if (asset.layer === 'skin') {
@@ -103,7 +130,7 @@ function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
         standard.needsUpdate = true;
       });
     });
-  }, [asset, layerVisibility, model, selectedStructureId, systemVisibility]);
+  }, [asset, hoveredMeshKey, layerVisibility, model, selectedStructureId, systemVisibility]);
 
   return (
     <primitive
@@ -118,20 +145,35 @@ function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
           selectMesh({ meshName: atlasNameForMesh(mesh.name), system: systemForMesh(asset, mesh.name) });
         }
       }}
-      onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+      onPointerOver={(event: ThreeEvent<PointerEvent>) => {
+        event.stopPropagation();
+        setHoveredMeshKey(meshKey(asset, (event.object as THREE.Mesh).name));
+        document.body.style.cursor = 'pointer';
+      }}
+      onPointerOut={() => {
+        setHoveredMeshKey(null);
+        document.body.style.cursor = 'auto';
+      }}
     />
   );
 }
 
 export function BodyModel() {
   const { layerVisibility } = useAnatomy();
+  const [hoveredMeshKey, setHoveredMeshKey] = useState<string | null>(null);
 
   return (
     <group>
       {Z_ANATOMY_ASSETS
         .filter((asset) => asset.layer !== 'skin' || layerVisibility.skin)
-        .map((asset) => <ZAnatomyAssetModel key={asset.id} asset={asset} />)}
+        .map((asset) => (
+          <ZAnatomyAssetModel
+            key={asset.id}
+            asset={asset}
+            hoveredMeshKey={hoveredMeshKey}
+            setHoveredMeshKey={setHoveredMeshKey}
+          />
+        ))}
     </group>
   );
 }

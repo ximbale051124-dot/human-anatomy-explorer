@@ -4,6 +4,7 @@
 
 export type SystemId =
   | 'skeletal'
+  | 'joints'
   | 'muscular'
   | 'cardiovascular'
   | 'respiratory'

@@ -8,6 +8,12 @@ export const SYSTEMS: SystemDefinition[] = [
     description: 'The bony framework that supports the body, protects internal organs, and enables movement via joints.',
   },
   {
+    id: 'joints',
+    label: 'Joints & Cartilage',
+    color: '#63A89A',
+    description: 'Joints, cartilage, ligaments, and related structures that connect bones and guide movement.',
+  },
+  {
     id: 'muscular',
     label: 'Muscular System',
     color: '#BF3E4A',

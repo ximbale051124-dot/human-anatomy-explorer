@@ -13,6 +13,7 @@ export interface ZAnatomyAsset {
 export const Z_ANATOMY_ASSETS: ZAnatomyAsset[] = [
   { id: 'skin', url: '/models/z-anatomy-clean/skin.glb?v=isolated-20260922', layer: 'skin', system: 'integumentary' },
   { id: 'skeletal', url: '/models/z-anatomy-clean/skeletal.glb?v=isolated-20260922', layer: 'bones', system: 'skeletal' },
+  { id: 'joints', url: '/models/z-anatomy-clean/joints.glb?v=isolated-20260922', layer: 'bones', system: 'joints' },
   { id: 'muscular', url: '/models/z-anatomy-clean/muscular.glb?v=isolated-20260922', layer: 'muscles', system: 'muscular' },
   { id: 'cardiovascular', url: '/models/z-anatomy-clean/cardiovascular.glb?v=isolated-20260922', layer: 'organs', system: 'cardiovascular' },
   { id: 'lymphatic', url: '/models/z-anatomy-clean/lymphatic.glb?v=isolated-20260922', layer: 'organs', system: 'lymphatic' },
