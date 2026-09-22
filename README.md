@@ -48,9 +48,10 @@ The production build has been verified after the Z-Anatomy integration.
 src/
   types/anatomy.ts          Shared TypeScript types
   data/
-    systems.ts               The 9 body systems (id, label, color, description)
-    structures.ts             Anatomical structure info (name, location, function, etc.)
-    zAnatomyModel.ts           Z-Anatomy asset catalogue and mesh-to-structure mapping
+    anatomy/records.ts        Generated anatomy records, indexed by anatomy ID
+    anatomy/atlas-manifest.ts Exact source-node bindings, generated with the GLBs
+    systems.ts                Atlas system definitions
+    zAnatomyModel.ts          Interactive GLB asset catalogue
   context/AnatomyContext.tsx   App-wide state: selection, system/layer visibility, search, camera commands
   components/
     Header/SearchBar.tsx
@@ -72,24 +73,22 @@ content without touching any rendering code, and vice versa.
 
 ## Included real anatomy model
 
-The viewer now loads the real Z-Anatomy atlas as six clean, optimized GLB
-system assets from `public/models/z-anatomy-clean/`. They were exported
-from the complete `Startup.blend` atlas included in the
+The viewer loads seven interaction-safe Z-Anatomy GLBs from
+`public/models/anatomy-atlas/`. They were exported from the complete
+`Startup.blend` atlas included in the
 [Z-Anatomy Models of human anatomy](https://github.com/Z-Anatomy/Models-of-human-anatomy)
 release. The export includes skin, skeletal, muscular, cardiovascular,
 lymphatic, and visceral collections, and deliberately excludes nervous-system,
 reference-line, cross-section, and bonus collections.
 
-The repeatable Blender exporter is `scripts/export_z_anatomy_glb.py`. To make
-a new export, open the source `Startup.blend` with Blender in background mode
-and run that script; copy its `web-exports/*.glb` files into
-`public/models/z-anatomy-clean/`.
+`scripts/export-interactive-atlas.py` assigns every exported GLB node a
+unique `extras.anatomyId` and writes its matching record/binding data to
+`src/data/anatomy/atlas.generated.json`. The browser reads only this ID from
+`mesh.userData.anatomyId`; it never guesses from a mesh name.
 
-`src/data/zAnatomyModel.ts` is the single integration point. It declares the
-asset files, classifies the combined visceral model into the digestive,
-urinary, reproductive, endocrine, and respiratory systems, and maps source
-mesh names to the structures in `structures.ts` for search, selection, and
-highlighting.
+Run `npm run audit:atlas` to verify every emitted mesh has one unique anatomy
+ID, record, binding, source asset, source node, and valid left/right side.
+Both `npm run dev` and `npm run build` run this audit first.
 
 ### Attribution and license
 
@@ -102,11 +101,11 @@ any redistributed model derivatives under the same license.
 
 ## Adding more anatomy content
 
-To add a new structure:
+To add teaching content for an existing structure:
 
-1. Add an entry to `STRUCTURES` in `src/data/structures.ts`.
-2. Add a matching source-mesh pattern to `structureMatchers` in
-   `src/data/zAnatomyModel.ts`.
+1. Find its unique record in `src/data/anatomy/atlas.generated.json`.
+2. Add its location, description, function, and related anatomy IDs in the
+   curated content pass.
 
-No other files need to change — the sidebar, search, and info panel all read
-from this shared data automatically.
+Do not add browser-side mesh-name matching. New atlas nodes must be exported
+with their anatomy ID through `scripts/export-interactive-atlas.py`.

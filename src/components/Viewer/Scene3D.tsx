@@ -15,13 +15,13 @@ function Loader() {
 }
 
 export function Scene3D() {
-  const { selectStructure } = useAnatomy();
+  const { selectAnatomyId } = useAnatomy();
 
   return (
     <Canvas
       shadows
       camera={{ position: [0.2, 1.5, 2.6], fov: 40 }}
-      onPointerMissed={() => selectStructure(null)}
+      onPointerMissed={() => selectAnatomyId(null)}
     >
       <color attach="background" args={['#EEF3F4']} />
       <hemisphereLight args={['#FFFFFF', '#B8C4C8', 0.6]} />

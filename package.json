@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "audit:atlas": "node scripts/audit-interactive-atlas.mjs",
+    "dev": "npm run audit:atlas && vite",
+    "build": "npm run audit:atlas && tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

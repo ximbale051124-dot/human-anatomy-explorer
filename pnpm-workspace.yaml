@@ -1,0 +1,7 @@
+overrides:
+  '@use-gesture/core': 10.2.27
+  '@use-gesture/react': 10.2.27
+onlyBuiltDependencies:
+  - esbuild
+allowBuilds:
+  esbuild: set this to true or false

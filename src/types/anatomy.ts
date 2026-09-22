@@ -1,59 +1,46 @@
-// Core type definitions for the anatomy data model.
-// Keeping these separate from components/data keeps the app easy to extend
-// (e.g. swapping the placeholder primitives for a real GLB model later).
+export type AnatomyId = string;
 
 export type SystemId =
   | 'skeletal'
-  | 'joints'
   | 'muscular'
+  | 'joints'
   | 'cardiovascular'
-  | 'respiratory'
-  | 'digestive'
-  | 'urinary'
-  | 'reproductive'
-  | 'endocrine'
-  | 'lymphatic';
+  | 'visceral'
+  | 'lymphatic'
+  | 'integumentary';
 
-// Layers represent anatomical "depth" from the outside in.
-// This is independent from SystemId: e.g. the "organs" layer contains
-// structures from several systems (cardiovascular, respiratory, etc).
+export type SourceAssetId = SystemId;
+export type Side = 'left' | 'right' | 'midline';
 export type LayerId = 'skin' | 'muscles' | 'bones' | 'organs';
+export type ViewPreset = 'front' | 'back' | 'left' | 'right' | 'reset';
 
 export interface SystemDefinition {
   id: SystemId;
   label: string;
-  color: string; // hex, used for the sidebar swatch and mesh highlight tint
+  color: string;
   description: string;
 }
 
-export interface AnatomicalStructure {
-  id: string;
-  anatomicalName: string;
-  commonName: string;
-  system: SystemId | 'integumentary';
+/** One learner-facing anatomical structure, always identified by its atlas ID. */
+export interface AnatomyRecord {
+  id: AnatomyId;
+  displayName: string;
+  latinName: string | null;
+  aliases: string[];
+  system: SystemId;
   layer: LayerId;
-  location: string;
-  structure: string;
-  mainFunction: string;
-  relatedStructures: string[];
+  side: Side;
+  sourceAsset: SourceAssetId;
+  sourceNode: string;
+  description: string | null;
+  function: string | null;
+  location: string | null;
+  relatedAnatomyIds: AnatomyId[];
 }
 
-// Describes one primitive mesh placed in the 3D scene.
-// Multiple meshes can point at the same AnatomicalStructure (e.g. left/right
-// femur), and this is the piece of the codebase to replace once a real
-// GLB/GLTF anatomical model is available (see src/components/Viewer/BodyModel.tsx).
-export type PrimitiveGeometry = 'box' | 'sphere' | 'cylinder' | 'capsule' | 'torus' | 'cone';
-
-export interface MeshConfig {
-  meshId: string;
-  structureId: string;
-  layer: LayerId;
-  system: SystemId | 'integumentary';
-  geometry: PrimitiveGeometry;
-  args: number[];
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  color: string;
+/** Exact source-node binding produced with the interactive GLB export. */
+export interface AnatomyBinding {
+  anatomyId: AnatomyId;
+  sourceAsset: SourceAssetId;
+  sourceNode: string;
 }
-
-export type ViewPreset = 'front' | 'back' | 'left' | 'right' | 'reset';
