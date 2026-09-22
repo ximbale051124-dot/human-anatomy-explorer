@@ -113,14 +113,7 @@ function ZAnatomyAssetModel({
     });
     return clone;
   }, [source.scene]);
-  const {
-    selectedStructureId,
-    selectedMesh,
-    selectMesh,
-    selectStructure,
-    systemVisibility,
-    layerVisibility,
-  } = useAnatomy();
+  const { selectedStructureId, selectMesh, selectStructure, systemVisibility, layerVisibility } = useAnatomy();
 
   useEffect(() => {
     model.traverse((object) => {
@@ -137,11 +130,7 @@ function ZAnatomyAssetModel({
       }
       const system = systemForMesh(asset, object.name);
       const structureId = structureIdForMesh(object.name);
-      const atlasName = atlasNameForMesh(object.name);
-      const isSelected = (structureId !== null && structureId === selectedStructureId) ||
-        (selectedMesh !== null &&
-          selectedMesh.meshName === atlasName &&
-          selectedMesh.system === system);
+      const isSelected = structureId !== null && structureId === selectedStructureId;
       const isHovered = hoveredMeshKey === meshKey(asset, object.name);
       object.userData.structureId = structureId;
       object.visible = !isMuscleCoveringLayer(asset, object.name) && layerVisibility[asset.layer] &&
