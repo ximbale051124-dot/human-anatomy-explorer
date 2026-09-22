@@ -66,7 +66,7 @@ function isMuscleCoveringLayer(asset: ZAnatomyAsset, meshName: string): boolean 
   // These broad connective-tissue sheets sit over the individual muscle
   // bellies in the atlas. Keeping them in the same opaque layer makes the
   // body read as one red shell rather than distinct muscles.
-  return asset.id === 'muscular' && /\b(fascia|aponeurosis)\b/i.test(meshName);
+  return asset.system === 'muscular' && /\b(fascia|aponeurosis)\b/i.test(meshName);
 }
 
 function atlasMaterialColor(
