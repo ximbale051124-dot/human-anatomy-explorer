@@ -12,7 +12,6 @@ import {
 import { useAnatomy } from '../../context/AnatomyContext';
 const HIGHLIGHT_COLOR = new THREE.Color('#FFD23F');
 const HOVER_COLOR = new THREE.Color('#F4D35E');
-const WHITE = new THREE.Color('#FFFFFF');
 useGLTF.setDecoderPath('/draco/');
 const INTEGUMENTARY_COLOR = new THREE.Color('#E9B28C');
 const SYSTEM_COLORS: Record<string, THREE.Color> = {
@@ -140,21 +139,9 @@ function ZAnatomyAssetModel({
 
       materials(object).forEach((material) => {
         const standard = material as THREE.MeshStandardMaterial;
-        const hasBakedVertexColor = Boolean(object.geometry.getAttribute('color'));
         const baseColor = atlasMaterialColor(system, object.name, String(object.userData.atlasMaterialName ?? ''));
-        // The vertex-colour export contains the original Z-Anatomy tissue
-        // shading. Retain it at rest; selection and hover temporarily become
-        // high-contrast teaching colours so the precise mesh is unambiguous.
-        standard.vertexColors = hasBakedVertexColor && !isSelected && !isHovered;
-        standard.color.copy(
-          isSelected
-            ? HIGHLIGHT_COLOR
-            : isHovered
-              ? HOVER_COLOR
-              : hasBakedVertexColor
-                ? WHITE
-                : baseColor
-        );
+        standard.vertexColors = false;
+        standard.color.copy(isSelected ? HIGHLIGHT_COLOR : isHovered ? HOVER_COLOR : baseColor);
         standard.emissive.set(isSelected ? HIGHLIGHT_COLOR : isHovered ? HOVER_COLOR : '#000000');
         standard.emissiveIntensity = isSelected ? 0.65 : isHovered ? 0.28 : 0;
         standard.transparent = false;
