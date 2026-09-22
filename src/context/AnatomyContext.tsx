@@ -88,15 +88,6 @@ export function AnatomyProvider({ children }: { children: React.ReactNode }) {
     setSystemVisibility(
       Object.fromEntries(SYSTEMS.map((s) => [s.id, s.id === id])) as Record<SystemId, boolean>
     );
-    // A system-only action must also reveal the layer carrying that system.
-    // Otherwise selecting "Only Skeletal" after hiding Bones appears to do
-    // nothing, and opaque muscles can continue to conceal the skeleton.
-    setLayerVisibility({
-      skin: false,
-      muscles: id === 'muscular',
-      bones: id === 'skeletal' || id === 'joints',
-      organs: !['skeletal', 'joints', 'muscular'].includes(id),
-    });
   }, []);
 
   const toggleLayer = useCallback((id: LayerId) => {
