@@ -11,12 +11,12 @@ export interface ZAnatomyAsset {
 }
 
 export const Z_ANATOMY_ASSETS: ZAnatomyAsset[] = [
-  { id: 'skin', url: '/models/z-anatomy-clean/skin.glb', layer: 'skin', system: 'integumentary' },
-  { id: 'skeletal', url: '/models/z-anatomy-clean/skeletal.glb', layer: 'bones', system: 'skeletal' },
-  { id: 'muscular', url: '/models/z-anatomy-clean/muscular.glb', layer: 'muscles', system: 'muscular' },
-  { id: 'cardiovascular', url: '/models/z-anatomy-clean/cardiovascular.glb', layer: 'organs', system: 'cardiovascular' },
-  { id: 'lymphatic', url: '/models/z-anatomy-clean/lymphatic.glb', layer: 'organs', system: 'lymphatic' },
-  { id: 'visceral', url: '/models/z-anatomy-clean/visceral.glb', layer: 'organs', system: 'digestive' },
+  { id: 'skin', url: '/models/z-anatomy-clean/skin.glb?v=clean-20260922', layer: 'skin', system: 'integumentary' },
+  { id: 'skeletal', url: '/models/z-anatomy-clean/skeletal.glb?v=clean-20260922', layer: 'bones', system: 'skeletal' },
+  { id: 'muscular', url: '/models/z-anatomy-clean/muscular.glb?v=clean-20260922', layer: 'muscles', system: 'muscular' },
+  { id: 'cardiovascular', url: '/models/z-anatomy-clean/cardiovascular.glb?v=clean-20260922', layer: 'organs', system: 'cardiovascular' },
+  { id: 'lymphatic', url: '/models/z-anatomy-clean/lymphatic.glb?v=clean-20260922', layer: 'organs', system: 'lymphatic' },
+  { id: 'visceral', url: '/models/z-anatomy-clean/visceral.glb?v=clean-20260922', layer: 'organs', system: 'digestive' },
 ];
 
 const structureMatchers: Array<[string, RegExp]> = [
