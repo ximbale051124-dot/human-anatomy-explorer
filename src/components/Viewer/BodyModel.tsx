@@ -17,7 +17,7 @@ const INTEGUMENTARY_COLOR = new THREE.Color('#E9B28C');
 const SYSTEM_COLORS: Record<string, THREE.Color> = {
   skeletal: new THREE.Color('#B8C7D9'),
   joints: new THREE.Color('#63A89A'),
-  muscular: new THREE.Color('#BF3E4A'),
+  muscular: new THREE.Color('#B96839'),
   cardiovascular: new THREE.Color('#C92C36'),
   respiratory: new THREE.Color('#4D9DE0'),
   digestive: new THREE.Color('#DE8D35'),
@@ -51,9 +51,37 @@ function variedSystemColor(base: THREE.Color, meshName: string): THREE.Color {
   // neighbouring muscles, bones, and organs without changing system identity.
   let hash = 0;
   for (let index = 0; index < meshName.length; index += 1) hash = (hash * 31 + meshName.charCodeAt(index)) | 0;
+  const stableHash = hash >>> 0;
   const color = base.clone();
-  color.offsetHSL(0, 0, ((hash % 9) - 4) * 0.018);
+  color.offsetHSL(
+    ((stableHash % 7) - 3) * 0.006,
+    ((stableHash % 5) - 2) * 0.015,
+    ((stableHash % 9) - 4) * 0.025
+  );
   return color;
+}
+
+function isMuscleCoveringLayer(asset: ZAnatomyAsset, meshName: string): boolean {
+  // These broad connective-tissue sheets sit over the individual muscle
+  // bellies in the atlas. Keeping them in the same opaque layer makes the
+  // body read as one red shell rather than distinct muscles.
+  return asset.id === 'muscular' && /\b(fascia|aponeurosis)\b/i.test(meshName);
+}
+
+function atlasMaterialColor(
+  system: string,
+  meshName: string,
+  materialName: string
+): THREE.Color {
+  const nativeMaterial = materialName.toLowerCase();
+  const nativeMesh = meshName.toLowerCase();
+  if (/cartilage/.test(nativeMaterial) || /cartilage/.test(nativeMesh)) return new THREE.Color('#9DB5A4');
+  if (/tendon/.test(nativeMaterial) || /tendon/.test(nativeMesh)) return new THREE.Color('#D6C1A8');
+  if (/ligament|articular capsule/.test(nativeMaterial) || /ligament/.test(nativeMesh)) return new THREE.Color('#8DAEA4');
+  return variedSystemColor(
+    system === 'integumentary' ? INTEGUMENTARY_COLOR : SYSTEM_COLORS[system],
+    meshName
+  );
 }
 
 function ZAnatomyAssetModel({
@@ -73,6 +101,8 @@ function ZAnatomyAssetModel({
     // settings that make unrelated systems look alike in a web renderer.
     clone.traverse((object) => {
       if (!isRenderableAnatomyObject(object)) return;
+      const sourceMaterial = Array.isArray(object.material) ? object.material[0] : object.material;
+      object.userData.atlasMaterialName = sourceMaterial?.name ?? '';
       object.material = new THREE.MeshStandardMaterial({
         color: '#FFFFFF',
         roughness: 0.6,
@@ -102,17 +132,14 @@ function ZAnatomyAssetModel({
       const isSelected = structureId !== null && structureId === selectedStructureId;
       const isHovered = hoveredMeshKey === meshKey(asset, object.name);
       object.userData.structureId = structureId;
-      object.visible = layerVisibility[asset.layer] &&
+      object.visible = !isMuscleCoveringLayer(asset, object.name) && layerVisibility[asset.layer] &&
         (system === 'integumentary' || systemVisibility[system]);
       object.castShadow = false;
       object.receiveShadow = false;
 
       materials(object).forEach((material) => {
         const standard = material as THREE.MeshStandardMaterial;
-        const systemColor = system === 'integumentary'
-          ? INTEGUMENTARY_COLOR
-          : SYSTEM_COLORS[system];
-        const baseColor = variedSystemColor(systemColor, object.name);
+        const baseColor = atlasMaterialColor(system, object.name, String(object.userData.atlasMaterialName ?? ''));
         standard.vertexColors = false;
         standard.color.copy(isSelected ? HIGHLIGHT_COLOR : isHovered ? HOVER_COLOR : baseColor);
         standard.emissive.set(isSelected ? HIGHLIGHT_COLOR : isHovered ? HOVER_COLOR : '#000000');

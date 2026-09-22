@@ -16,7 +16,7 @@ export const SYSTEMS: SystemDefinition[] = [
   {
     id: 'muscular',
     label: 'Muscular System',
-    color: '#BF3E4A',
+    color: '#B96839',
     description: 'Skeletal muscles that contract to produce movement, maintain posture, and generate heat.',
   },
   {
