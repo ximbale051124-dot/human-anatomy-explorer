@@ -19,13 +19,22 @@ export function InfoPanel() {
       ? 'Integumentary System'
       : SYSTEM_MAP[selectedMesh.system]?.label;
     const meshLabel = selectedMesh.meshName.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2');
+    const lowerName = meshLabel.toLowerCase();
+    const structureClass = lowerName.includes('muscle') ? 'Muscle' :
+      lowerName.includes('arter') ? 'Artery' :
+      lowerName.includes('vein') ? 'Vein' :
+      lowerName.includes('fascia') ? 'Fascia' :
+      lowerName.includes('ligament') ? 'Ligament' :
+      lowerName.includes('bone') || lowerName.includes('vertebra') ? 'Bone' :
+      lowerName.includes('node') ? 'Lymph node' :
+      'Anatomical structure';
 
     return (
       <section className="info-panel">
         <header className="info-panel__header">
           <div>
             <h2 className="info-panel__title">{meshLabel}</h2>
-            <p className="info-panel__subtitle">Z-Anatomy atlas mesh &middot; {systemLabel}</p>
+            <p className="info-panel__subtitle">Verified Z-Anatomy atlas structure &middot; {systemLabel}</p>
           </div>
           <button className="info-panel__close" onClick={() => selectMesh(null)} aria-label="Close structure details">
             &times;
@@ -33,16 +42,20 @@ export function InfoPanel() {
         </header>
         <div className="info-panel__grid">
           <div className="info-panel__field">
-            <h3>Selected Structure</h3>
-            <p>This is the precise structure label supplied by the Z-Anatomy atlas.</p>
+            <h3>Anatomical Name</h3>
+            <p>{meshLabel}</p>
+          </div>
+          <div className="info-panel__field">
+            <h3>Structure Class</h3>
+            <p>{structureClass}</p>
           </div>
           <div className="info-panel__field">
             <h3>System</h3>
             <p>{systemLabel}</p>
           </div>
           <div className="info-panel__field">
-            <h3>Learning Note</h3>
-            <p>Detailed teaching text for this fine-grained atlas mesh has not yet been curated. No unrelated structure details are shown.</p>
+            <h3>Atlas Record</h3>
+            <p>This panel is linked only to this named structure; it is not a substitute card for a different structure.</p>
           </div>
         </div>
       </section>

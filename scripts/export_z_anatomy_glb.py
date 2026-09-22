@@ -27,14 +27,19 @@ for output_name, collection_name in SYSTEMS.items():
     if collection is None:
         raise RuntimeError(f"Missing Z-Anatomy collection: {collection_name}")
 
-    bpy.ops.object.select_all(action="DESELECT")
+    # `select_all(DESELECT)` skips hidden atlas objects. Explicitly clear every
+    # object first, otherwise the prior system remains selected and is silently
+    # appended to the next GLB export.
+    for obj in bpy.context.scene.objects:
+        obj.hide_set(False)
+        obj.select_set(False)
+
     selected = []
     for obj in collection.all_objects:
         # Atlas collection-title labels are meshes named e.g. "Skeletal
         # system.g". They are presentation aids in Blender, not anatomy.
         if obj.type not in {"MESH", "CURVE", "SURFACE"} or obj.name.endswith(".g"):
             continue
-        obj.hide_set(False)
         obj.select_set(True)
         selected.append(obj)
 

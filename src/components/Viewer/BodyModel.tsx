@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { type ThreeEvent } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import {
+  atlasNameForMesh,
   structureIdForMesh,
   systemForMesh,
   Z_ANATOMY_ASSETS,
@@ -114,7 +115,7 @@ function ZAnatomyAssetModel({ asset }: { asset: ZAnatomyAsset }) {
         if (structureId) {
           selectStructure(structureId);
         } else {
-          selectMesh({ meshName: mesh.name, system: systemForMesh(asset, mesh.name) });
+          selectMesh({ meshName: atlasNameForMesh(mesh.name), system: systemForMesh(asset, mesh.name) });
         }
       }}
       onPointerOver={() => { document.body.style.cursor = 'pointer'; }}

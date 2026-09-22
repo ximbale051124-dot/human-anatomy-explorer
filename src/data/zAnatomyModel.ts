@@ -11,55 +11,53 @@ export interface ZAnatomyAsset {
 }
 
 export const Z_ANATOMY_ASSETS: ZAnatomyAsset[] = [
-  { id: 'skin', url: '/models/z-anatomy-clean/skin.glb?v=clean-20260922', layer: 'skin', system: 'integumentary' },
-  { id: 'skeletal', url: '/models/z-anatomy-clean/skeletal.glb?v=clean-20260922', layer: 'bones', system: 'skeletal' },
-  { id: 'muscular', url: '/models/z-anatomy-clean/muscular.glb?v=clean-20260922', layer: 'muscles', system: 'muscular' },
-  { id: 'cardiovascular', url: '/models/z-anatomy-clean/cardiovascular.glb?v=clean-20260922', layer: 'organs', system: 'cardiovascular' },
-  { id: 'lymphatic', url: '/models/z-anatomy-clean/lymphatic.glb?v=clean-20260922', layer: 'organs', system: 'lymphatic' },
-  { id: 'visceral', url: '/models/z-anatomy-clean/visceral.glb?v=clean-20260922', layer: 'organs', system: 'digestive' },
+  { id: 'skin', url: '/models/z-anatomy-clean/skin.glb?v=isolated-20260922', layer: 'skin', system: 'integumentary' },
+  { id: 'skeletal', url: '/models/z-anatomy-clean/skeletal.glb?v=isolated-20260922', layer: 'bones', system: 'skeletal' },
+  { id: 'muscular', url: '/models/z-anatomy-clean/muscular.glb?v=isolated-20260922', layer: 'muscles', system: 'muscular' },
+  { id: 'cardiovascular', url: '/models/z-anatomy-clean/cardiovascular.glb?v=isolated-20260922', layer: 'organs', system: 'cardiovascular' },
+  { id: 'lymphatic', url: '/models/z-anatomy-clean/lymphatic.glb?v=isolated-20260922', layer: 'organs', system: 'lymphatic' },
+  { id: 'visceral', url: '/models/z-anatomy-clean/visceral.glb?v=isolated-20260922', layer: 'organs', system: 'digestive' },
 ];
 
-const structureMatchers: Array<[string, RegExp]> = [
-  ['skin', /region_of_human_body|body_region|skin/i],
-  ['skull', /cranium|skull/i],
-  ['vertebral-column', /vertebral_column|vertebra(?!l_artery)/i],
-  ['ribcage', /rib|sternum|thoracic_cage/i],
-  ['pelvis', /pelvis|hip_bone|ilium|ischium|pubis/i],
-  ['humerus', /humerus/i],
-  ['forearm-bones', /radius|ulna/i],
-  ['femur', /femur/i],
-  ['lower-leg-bones', /tibia|fibula/i],
-  ['pectoralis-major', /pectoralis[ _.-]major/i],
-  ['rectus-abdominis', /rectus[ _.-]abdominis/i],
-  ['deltoid', /deltoid/i],
-  ['biceps-brachii', /biceps[ _.-]brachii/i],
-  ['triceps-brachii', /triceps[ _.-]brachii/i],
-  ['quadriceps-femoris', /quadriceps|rectus[ _.-]femoris|vastus[ _.-]/i],
-  ['hamstrings', /hamstring|biceps[ _.-]femoris|semitendinosus|semimembranosus/i],
-  ['gastrocnemius', /gastrocnemius/i],
-  ['trapezius', /trapezius/i],
-  ['heart', /heart|atrium|ventricle/i],
-  ['aorta', /aorta/i],
-  ['trachea', /trachea/i],
-  ['lung-left', /left[ _.-]lung/i],
-  ['lung-right', /right[ _.-]lung/i],
-  ['liver', /liver/i],
-  ['stomach', /stomach/i],
-  ['intestines', /intestin|duodenum|jejunum|ileum|colon|rectum/i],
-  ['kidney-left', /left[ _.-]kidney/i],
-  ['kidney-right', /right[ _.-]kidney/i],
-  ['bladder', /bladder/i],
-  ['reproductive-organs', /uterus|ovary|testis|prostate|penis|vagina|cervix|seminal[ _.-]vesicle|uterine[ _.-]tube/i],
-  ['thyroid', /thyroid/i],
-  ['pancreas', /pancreas/i],
-  ['adrenal-glands', /adrenal|suprarenal/i],
-  ['spleen', /spleen/i],
-  ['thymus', /thymus/i],
-  ['lymph-nodes', /lymph.*node|lymphatic.*node/i],
-];
+/** Removes Z-Anatomy's left/right suffix without collapsing a named sub-part. */
+export function atlasNameForMesh(meshName: string): string {
+  return meshName
+    .replace(/\.(?:l|r)(?:\.\d+)?$/i, '')
+    .replace(/\.\d+$/, '')
+    .replace(/^\((.+)\)$/, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Only exact atlas labels map to our curated teaching cards. Broad regular
+// expressions were assigning, for example, biceps femoris to biceps brachii.
+// Every other click remains a distinct atlas record rather than showing a
+// plausible but incorrect structure card.
+const EXACT_STRUCTURE_IDS: Record<string, string> = {
+  'femur': 'femur',
+  'humerus': 'humerus',
+  'heart': 'heart',
+  'aorta': 'aorta',
+  'liver': 'liver',
+  'stomach': 'stomach',
+  'trachea': 'trachea',
+  'pancreas': 'pancreas',
+  'spleen': 'spleen',
+  'thyroid gland': 'thyroid',
+  'urinary bladder': 'bladder',
+  'left kidney': 'kidney-left',
+  'right kidney': 'kidney-right',
+  'pectoralis major muscle': 'pectoralis-major',
+  'rectus abdominis muscle': 'rectus-abdominis',
+  'deltoid muscle': 'deltoid',
+  'biceps brachii muscle': 'biceps-brachii',
+  'triceps brachii muscle': 'triceps-brachii',
+  'gastrocnemius muscle': 'gastrocnemius',
+  'trapezius muscle': 'trapezius',
+};
 
 export function structureIdForMesh(meshName: string): string | null {
-  return structureMatchers.find(([, pattern]) => pattern.test(meshName))?.[0] ?? null;
+  return EXACT_STRUCTURE_IDS[atlasNameForMesh(meshName).toLowerCase()] ?? null;
 }
 
 // The visceral atlas includes several systems in one GLB. This lightweight
