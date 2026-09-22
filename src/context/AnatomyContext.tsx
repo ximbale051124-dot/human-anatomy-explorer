@@ -6,10 +6,17 @@ export type ViewCommand =
   | { type: 'preset'; preset: ViewPreset }
   | { type: 'focus'; position: [number, number, number] };
 
+export interface RawMeshSelection {
+  meshName: string;
+  system: SystemId | 'integumentary';
+}
+
 interface AnatomyContextValue {
   // Selection
   selectedStructureId: string | null;
   selectStructure: (id: string | null) => void;
+  selectedMesh: RawMeshSelection | null;
+  selectMesh: (selection: RawMeshSelection | null) => void;
 
   // Systems visibility
   systemVisibility: Record<SystemId, boolean>;
@@ -41,6 +48,7 @@ const ALL_SYSTEMS_TRUE = Object.fromEntries(SYSTEMS.map((s) => [s.id, true])) as
 
 export function AnatomyProvider({ children }: { children: React.ReactNode }) {
   const [selectedStructureId, setSelectedStructureId] = useState<string | null>(null);
+  const [selectedMesh, setSelectedMesh] = useState<RawMeshSelection | null>(null);
   const [systemVisibility, setSystemVisibility] = useState<Record<SystemId, boolean>>(
     ALL_SYSTEMS_TRUE
   );
@@ -55,7 +63,14 @@ export function AnatomyProvider({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewCommand, setViewCommand] = useState<ViewCommand | null>(null);
 
-  const selectStructure = useCallback((id: string | null) => setSelectedStructureId(id), []);
+  const selectStructure = useCallback((id: string | null) => {
+    setSelectedStructureId(id);
+    setSelectedMesh(null);
+  }, []);
+  const selectMesh = useCallback((selection: RawMeshSelection | null) => {
+    setSelectedMesh(selection);
+    setSelectedStructureId(null);
+  }, []);
 
   const toggleSystem = useCallback((id: SystemId) => {
     setSystemVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -86,6 +101,8 @@ export function AnatomyProvider({ children }: { children: React.ReactNode }) {
     () => ({
       selectedStructureId,
       selectStructure,
+      selectedMesh,
+      selectMesh,
       systemVisibility,
       toggleSystem,
       showAllSystems,
@@ -102,6 +119,8 @@ export function AnatomyProvider({ children }: { children: React.ReactNode }) {
     [
       selectedStructureId,
       selectStructure,
+      selectedMesh,
+      selectMesh,
       systemVisibility,
       toggleSystem,
       showAllSystems,

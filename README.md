@@ -72,10 +72,18 @@ content without touching any rendering code, and vice versa.
 
 ## Included real anatomy model
 
-The viewer now loads the real Z-Anatomy atlas as separate system-level FBX
-assets from `public/models/z-anatomy/`. This keeps the anatomy layers and
-systems independently visible while avoiding a proprietary model or backend.
-The integration deliberately excludes Z-Anatomy's nervous-system file.
+The viewer now loads the real Z-Anatomy atlas as six clean, optimized GLB
+system assets from `public/models/z-anatomy-clean/`. They were exported
+from the complete `Startup.blend` atlas included in the
+[Z-Anatomy Models of human anatomy](https://github.com/Z-Anatomy/Models-of-human-anatomy)
+release. The export includes skin, skeletal, muscular, cardiovascular,
+lymphatic, and visceral collections, and deliberately excludes nervous-system,
+reference-line, cross-section, and bonus collections.
+
+The repeatable Blender exporter is `scripts/export_z_anatomy_glb.py`. To make
+a new export, open the source `Startup.blend` with Blender in background mode
+and run that script; copy its `web-exports/*.glb` files into
+`public/models/z-anatomy-clean/`.
 
 `src/data/zAnatomyModel.ts` is the single integration point. It declares the
 asset files, classifies the combined visceral model into the digestive,
@@ -89,7 +97,7 @@ The included assets are from **Z-Anatomy — the libre 3D atlas of anatomy** by
 Gauthier Kervyn, Marcin Zielinski, and Lluís Vinent Juanico, with a model
 lineage from **BodyParts3D — The Database Center for Life Science**. They are
 provided under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-Keep the attribution in `public/models/z-anatomy/ATTRIBUTION.md` and release
+Keep the attribution in `public/models/z-anatomy-clean/ATTRIBUTION.md` and release
 any redistributed model derivatives under the same license.
 
 ## Adding more anatomy content
